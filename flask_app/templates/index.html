@@ -1,0 +1,286 @@
+<!-- templates/index.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>File Handler</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+        }
+
+        #drop-zone {
+            width: 100%;
+            height: 100px;
+            border: 2px dashed #ccc;
+            border-radius: 4px;
+            text-align: center;
+            padding: 20px;
+            margin: 20px 0;
+            background-color: #f9f9f9;
+            transition: all 0.3s ease;
+        }
+
+        #drop-zone.dragover {
+            background-color: #e1e1e1;
+            border-color: #999;
+        }
+
+        #drop-zone.has-file {
+            background-color: #e8f5e9;
+            border-color: #4CAF50;
+        }
+
+        textarea {
+            width: 100%;
+            height: 200px;
+            margin: 10px 0;
+            padding: 10px;
+            box-sizing: border-box;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-family: monospace;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            color: white;
+            transition: opacity 0.3s ease;
+        }
+
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        #send-btn {
+            background-color: #4CAF50;
+        }
+
+        .html-btn {
+            background-color: #2196F3;
+        }
+
+        button:hover:not(:disabled) {
+            opacity: 0.9;
+        }
+
+        #file-info {
+            margin-top: 10px;
+            color: #666;
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px;
+            border-radius: 4px;
+            color: white;
+            display: none;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(100%); }
+            to { transform: translateX(0); }
+        }
+
+        .success { background-color: #4CAF50; }
+        .error { background-color: #f44336; }
+    </style>
+</head>
+<body>
+    <h1>File Handler</h1>
+    
+    <div id="drop-zone">
+        Drop file here or click to select
+        <input type="file" id="file-input" style="display: none;">
+    </div>
+    
+    <div id="file-info"></div>
+    
+    <textarea id="content-area" placeholder="Content will appear here..." spellcheck="false"></textarea>
+    
+    <div class="button-group">
+        <button id="send-btn" disabled>Send</button>
+        <button id="receive-btn" class="html-btn">receive.html</button>
+        <button id="send-html-btn" class="html-btn">send.html</button>
+    </div>
+
+    <div id="notification" class="notification"></div>
+
+    <script>
+        const dropZone = document.getElementById('drop-zone');
+        const fileInput = document.getElementById('file-input');
+        const fileInfo = document.getElementById('file-info');
+        const contentArea = document.getElementById('content-area');
+        const sendBtn = document.getElementById('send-btn');
+        const receiveBtn = document.getElementById('receive-btn');
+        const sendHtmlBtn = document.getElementById('send-html-btn');
+        const notification = document.getElementById('notification');
+
+        let hasFile = false;
+
+        function showNotification(message, type) {
+            notification.textContent = message;
+            notification.className = `notification ${type}`;
+            notification.style.display = 'block';
+            setTimeout(() => {
+                notification.style.display = 'none';
+            }, 3000);
+        }
+
+        // Drag and drop handlers
+        dropZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropZone.classList.add('dragover');
+        });
+
+        dropZone.addEventListener('dragleave', () => {
+            dropZone.classList.remove('dragover');
+        });
+
+        dropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropZone.classList.remove('dragover');
+            handleFiles(e.dataTransfer.files);
+        });
+
+        // Click to select file
+        dropZone.addEventListener('click', () => {
+            fileInput.click();
+        });
+
+        fileInput.addEventListener('change', (e) => {
+            handleFiles(e.target.files);
+        });
+
+        function handleFiles(files) {
+            if (files.length > 0) {
+                const file = files[0];
+                hasFile = true;
+                dropZone.classList.add('has-file');
+                fileInfo.textContent = `Selected file: ${file.name} (${formatFileSize(file.size)})`;
+                sendBtn.disabled = false;
+                
+                const formData = new FormData();
+                formData.append('file', file);
+
+                fetch('/send_file', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.base64) {
+                        contentArea.value = data.base64;
+                        showNotification('File processed successfully!', 'success');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    showNotification('Error processing file', 'error');
+                });
+            }
+        }
+
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+
+        // Button handlers
+        sendBtn.addEventListener('click', () => {
+            if (hasFile) {
+                // Handle file-initiated send
+                navigator.clipboard.writeText(contentArea.value)
+                    .then(() => {
+                        showNotification('Content copied to clipboard!', 'success');
+                    })
+                    .catch(() => {
+                        showNotification('Error copying to clipboard', 'error');
+                    });
+            } else {
+                // Handle text-initiated send
+                fetch('/send_text', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ text: contentArea.value })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        showNotification('Content processed successfully!', 'success');
+                    } else {
+                        showNotification(data.error || 'Error processing content', 'error');
+                    }
+                })
+                .catch(() => {
+                    showNotification('Error processing content', 'error');
+                });
+            }
+        });
+
+        receiveBtn.addEventListener('click', () => {
+            fetch('/get_receive_html')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.content) {
+                        contentArea.value = data.content;
+                        hasFile = false;
+                        dropZone.classList.remove('has-file');
+                        fileInfo.textContent = '';
+                        sendBtn.disabled = false;
+                        showNotification('Receive HTML loaded', 'success');
+                    }
+                })
+                .catch(() => {
+                    showNotification('Error loading receive.html', 'error');
+                });
+        });
+
+        sendHtmlBtn.addEventListener('click', () => {
+            fetch('/get_send_html')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.content) {
+                        contentArea.value = data.content;
+                        hasFile = false;
+                        dropZone.classList.remove('has-file');
+                        fileInfo.textContent = '';
+                        sendBtn.disabled = false;
+                        showNotification('Send HTML loaded', 'success');
+                    }
+                })
+                .catch(() => {
+                    showNotification('Error loading send.html', 'error');
+                });
+        });
+
+        // Enable send button when textarea has content
+        contentArea.addEventListener('input', () => {
+            sendBtn.disabled = !contentArea.value.trim();
+        });
+    </script>
+</body>
+</html>
