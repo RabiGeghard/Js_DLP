@@ -18,6 +18,8 @@ JS_DLP is a research project exploring data transfer mechanisms in restricted en
    - [Product Link](https://www.belkin.com/p/usb-c-data-charge-adapter/WCZ002btWH.html)
 3. USB-C to USB-A Male-to-Male Cable
 
+![connect_schema](images/connect_psd.png "connect_schema")
+
 ### Software Requirements
 
 - Raspberry Pi OS (latest version)
@@ -48,6 +50,7 @@ sudo apt-get install -y git python3-pip python3-venv
 git clone https://github.com/thewh1teagle/zero-hid
 cd zero-hid/usb_gadget
 sudo ./installer
+# Reboot system
 
 # Set up Python virtual environment
 python3 -m venv ~/venv
@@ -56,9 +59,6 @@ source ~/venv/bin/activate
 # Install required packages
 pip3 install zero-hid
 pip3 install flask
-
-# Reboot system
-sudo reboot
 ```
 
 ### 4. Install JS_DLP
@@ -82,7 +82,8 @@ python3 app.py
 4. Load `send.html`
 
 ### Receiving Data
-
+- open `send.html` on target pc
+- drop file into browser
 - Use `js_dlp.apk` on Android device
 - Or build from source code
 - Received data is stored in `/downloads/js_dlp/`
