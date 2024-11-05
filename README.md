@@ -66,9 +66,9 @@ sudo reboot
 ```bash
 cd ~
 git clone https://github.com/RabiGeghard/Js_DLP
-cd Js_dlp/flask_app 
-chmod +x run_flask.sh
-./run_flask.sh
+cd Js_DLP/flask_app 
+source ~/venv/bin/activate
+python3 app.py
 ```
 
 ## Usage

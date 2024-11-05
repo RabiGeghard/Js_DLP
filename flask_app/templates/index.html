@@ -209,16 +209,7 @@
 
         // Button handlers
         sendBtn.addEventListener('click', () => {
-            if (hasFile) {
-                // Handle file-initiated send
-                navigator.clipboard.writeText(contentArea.value)
-                    .then(() => {
-                        showNotification('Content copied to clipboard!', 'success');
-                    })
-                    .catch(() => {
-                        showNotification('Error copying to clipboard', 'error');
-                    });
-            } else {
+            {
                 // Handle text-initiated send
                 fetch('/send_text', {
                     method: 'POST',
