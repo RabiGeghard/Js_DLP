@@ -43,21 +43,45 @@ Follow the official Raspberry Pi setup guide:
 
 ```bash
 # Update system packages
+```
+```bash
 sudo apt-get update
+```
+```bash
 sudo apt-get install -y git python3-pip python3-venv
+```
+```bash
 
 # Clone zero-hid repository
+```
+```bash
 git clone https://github.com/thewh1teagle/zero-hid
+```
+```bash
 cd zero-hid/usb_gadget
+```
+```bash
 sudo ./installer
+```
+```bash
 # Reboot system
 
 # Set up Python virtual environment
+```
+```bash
 python3 -m venv ~/venv
+```
+```bash
 source ~/venv/bin/activate
+```
+```bash
 
 # Install required packages
+```
+```bash
 pip3 install zero-hid
+```
+```bash
 pip3 install flask
 ```
 
@@ -65,9 +89,17 @@ pip3 install flask
 
 ```bash
 cd ~
+```
+```bash
 git clone https://github.com/RabiGeghard/Js_DLP
+```
+```bash
 cd Js_DLP/flask_app 
+```
+```bash
 source ~/venv/bin/activate
+```
+```bash
 python3 app.py
 ```
 
@@ -99,7 +131,9 @@ If some frames cannot be scanned properly:
    - **Current**: Last scanned frame
    - **Scored**: Number of scanned frames
    - **Total**: Total number of frames
-
+   
+## Video 
+[![Alt text](https://img.youtube.com/vi/DQVI1KEKvwQ/0.jpg)](https://www.youtube.com/watch?v=DQVI1KEKvwQ)
 ## Technical Details
 
 The system operates by:
@@ -107,6 +141,14 @@ The system operates by:
 2. Establishing a web-based data transfer channel
 3. Implementing frame-based data transmission
 4. Providing Android-based receiver functionality
+
+## Result
+
+| Action | Size | Time | Speed |
+|---------|--------|------|-------|
+| In | 18.4k | 739s | 25 byte/sec |
+| Out | 131.6k | 53s | 2,542 byte/sec |
+
 
 ## Contributing
 
