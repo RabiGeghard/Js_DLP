@@ -27,6 +27,9 @@ JS_DLP is a research project exploring data transfer mechanisms in restricted en
 - Git
 - Web browser
 
+## Video 
+[![Alt text](https://img.youtube.com/vi/DQVI1KEKvwQ/0.jpg)](https://www.youtube.com/watch?v=DQVI1KEKvwQ)
+
 ## Installation
 
 ### 1. Set up Raspberry Pi 4
@@ -132,8 +135,6 @@ If some frames cannot be scanned properly:
    - **Scored**: Number of scanned frames
    - **Total**: Total number of frames
    
-## Video 
-[![Alt text](https://img.youtube.com/vi/DQVI1KEKvwQ/0.jpg)](https://www.youtube.com/watch?v=DQVI1KEKvwQ)
 ## Technical Details
 
 The system operates by:
