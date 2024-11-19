@@ -4,6 +4,7 @@ import os
 import base64
 from pathlib import Path
 from zero_hid import Keyboard, KeyCodes
+import gzip 
 
 app = Flask(__name__)
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB max file size
@@ -17,6 +18,18 @@ def get_file_content(filename):
         with open(file_path, 'r', encoding='utf-8') as f:
             return f.read()
     return None
+
+
+
+def encode_if_not_base64(lv_text):
+    try:
+        # Try to decode the text as base64
+        base64.b64decode(lv_text, validate=True)
+        return lv_text  # Already base64 encoded
+    except:
+        compressed_text = gzip.compress(lv_text.encode())
+        # If decoding fails, encode the text
+        return base64.b64encode(compressed_text).decode()
 
 def get_file_content_bin(filename):
     file_path = TEMPLATE_FOLDER / filename
@@ -44,6 +57,14 @@ def get_receive_html():
                 k.press([], KeyCodes.KEY_ENTER)
         return jsonify({'status': 'success'})
     return jsonify({'error': 'File not found'}), 404
+
+@app.route('/get_receive2_html')
+def get_receive2_html():
+
+    content = get_file_content_bin('receive2.zip')
+    if content:
+        return jsonify({'content': content})
+    return jsonify({'error': 'File not found'}), 404   
 
 @app.route('/get_send_html')
 def get_send_html():
@@ -83,8 +104,10 @@ def send_text_handler():
         return jsonify({'error': 'No text provided'}), 400
     
     try:
+        lv_data = data['text']
+        lv_data = encode_if_not_base64(lv_data)
         # Validate base64 content
-        lines = data['text'].split('\n')
+        lines = lv_data.split('\n')
         #base64.b64decode(data['text'])
         with Keyboard() as k:
 

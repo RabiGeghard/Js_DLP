@@ -119,6 +119,7 @@
     <div class="button-group">
         <button id="send-btn" disabled>Send</button>
         <button id="receive-btn" class="html-btn">receive.html</button>
+        <button id="receive-btn2" class="html-btn">receive2.html</button>
         <button id="send-html-btn" class="html-btn">send.html</button>
     </div>
 
@@ -131,6 +132,7 @@
         const contentArea = document.getElementById('content-area');
         const sendBtn = document.getElementById('send-btn');
         const receiveBtn = document.getElementById('receive-btn');
+        const receiveBtn2 = document.getElementById('receive-btn2');
         const sendHtmlBtn = document.getElementById('send-html-btn');
         const notification = document.getElementById('notification');
 
@@ -249,6 +251,26 @@
                     showNotification('Error loading receive.html', 'error');
                 });
         });
+
+        receiveBtn2.addEventListener('click', () => {
+            fetch('/get_receive2_html')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.content) {
+                        contentArea.value = data.content;
+                        hasFile = false;
+                        dropZone.classList.remove('has-file');
+                        fileInfo.textContent = '';
+                        sendBtn.disabled = false;
+                        showNotification('Receive HTML loaded', 'success');
+                    }
+                })
+                .catch(() => {
+                    showNotification('Error loading receive.html', 'error');
+                });
+        });
+
+        
 
         sendHtmlBtn.addEventListener('click', () => {
             fetch('/get_send_html')
